@@ -1,0 +1,13 @@
+version: '2'
+services:
+  mongo:
+    image: "mongo:3.4.1"
+  knuckles:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+
