@@ -2,6 +2,8 @@ version: '2'
 services:
   mongo:
     image: "mongo:3.4.1"
+  rabbitmq:
+    image: "rabbitmq:3.6.6-management"
   knuckles:
     build:
       context: .
@@ -10,4 +12,5 @@ services:
       - "8000:8000"
     depends_on:
       - mongo
+      - rabbitmq
 

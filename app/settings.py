@@ -4,11 +4,14 @@ from sanic.log import log
 CONF_FILE_PATH = "config.json"
 
 DEFAULTS = {
-    'mongo_connection_string': 'mongodb://mongo',
+    'mongo_uri': 'mongodb://mongo',
+    'rabbitmq_uri': 'rabbitmq',
     'host': '0.0.0.0',
     'port': 8000,
     'debug': True,
-    'workers': 1
+    'workers': 1,
+    'mongo_db_name': 'local',
+    'mongo_collection_name': 'crud_docs'
 }
 
 config = DEFAULTS
