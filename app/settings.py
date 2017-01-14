@@ -1,7 +1,7 @@
 import ujson
-from sanic.log import log
+import os.path
 
-CONF_FILE_PATH = "config.json"
+CONF_FILE_PATH = os.path.join(os.getcwd(), "config.json")
 
 DEFAULTS = {
     'mongo_uri': 'mongodb://mongo',
@@ -20,10 +20,10 @@ try:
     with open(CONF_FILE_PATH, 'r') as conf_file:
         config.update(ujson.load(conf_file))
 except OSError:
-    log.debug('Config file %s not present or inaccessible, using '
-              'defaults', CONF_FILE_PATH)
+    print('Config file {0} not present or inaccessible, using '
+          'defaults'.format(CONF_FILE_PATH))
 except ValueError:
-    log.debug('Config file %s does not contain valid JSON, using '
-              'defaults', CONF_FILE_PATH)
+    print('Config file {0} does not contain valid JSON, using '
+          'defaults'.format(CONF_FILE_PATH))
 else:
-    log.debug('Config file {0} loaded', CONF_FILE_PATH)
+    print('Config file {0} loaded'.format(CONF_FILE_PATH))

@@ -15,14 +15,15 @@ class NoIDHandlers(HTTPMethodView):
 
     async def get(self, request):
         all_docs = await self.mongo.get_all_docs(length=None)
-        return HTTPResponse(body=self.mongo.docs_to_json(all_docs),
-                            content_type="application/json")
+        response = HTTPResponse(body=self.mongo.docs_to_json(all_docs),
+                                content_type="application/json")
+        return response
 
     async def post(self, request):
         new_doc = request.json
         insert_result = await self.mongo.insert_or_update(doc=new_doc)
         if insert_result['result'] == 'inserted':
-            return text('Successfully inserted doc with id:{0}'.
+            return text('Successfully inserted document with id:{0}'.
                         format(insert_result['inserted_id']))
         else:
             raise sanic.exceptions.ServerError(
@@ -50,7 +51,7 @@ class IDHAndlers(HTTPMethodView):
         update_result = await self.mongo.insert_or_update(doc=new_doc,
                                                           doc_id=doc_id)
         if update_result["result"] == "updated":
-            return text('Successfully updated doc with id:{0}'.
+            return text('Successfully updated document with id:{0}'.
                         format(update_result['updated_id']))
         else:
             raise sanic.exceptions.ServerError(
@@ -60,7 +61,7 @@ class IDHAndlers(HTTPMethodView):
         delete_result = await self.mongo.delete_doc(doc_id=doc_id)
         if delete_result:
             return text(body='Successfully deleted document with id:{'
-                             '0}.'.format(doc_id))
+                             '0}'.format(doc_id))
         else:
             raise sanic.exceptions.NotFound(message='Cannot find document with'
                                                     ' id:{0}'.format(doc_id))
