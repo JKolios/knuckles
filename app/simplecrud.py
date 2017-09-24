@@ -30,7 +30,7 @@ class NoIDHandlers(HTTPMethodView):
                 message='Failed to insert document')
 
 
-simplecrud.add_route(NoIDHandlers(), '/')
+simplecrud.add_route(NoIDHandlers.as_view(), '/')
 
 
 class IDHAndlers(HTTPMethodView):
@@ -60,11 +60,10 @@ class IDHAndlers(HTTPMethodView):
     async def delete(self, request, doc_id):
         delete_result = await self.mongo.delete_doc(doc_id=doc_id)
         if delete_result:
-            return text(body='Successfully deleted document with id:{'
-                             '0}'.format(doc_id))
+            return text(body='Successfully deleted document with id:{0}'.format(doc_id))
         else:
             raise sanic.exceptions.NotFound(message='Cannot find document with'
                                                     ' id:{0}'.format(doc_id))
 
 
-simplecrud.add_route(IDHAndlers(), '/<doc_id>')
+simplecrud.add_route(IDHAndlers.as_view(), '/<doc_id>')

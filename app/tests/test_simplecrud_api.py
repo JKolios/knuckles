@@ -1,6 +1,5 @@
 """Tests for the "simplecrud" application blueprint"""
 import inject
-from sanic.utils import sanic_endpoint_test
 from ujson import loads, dumps
 from bson import json_util
 import pytest
@@ -12,7 +11,8 @@ from dependencies.mongo import Mongo
 
 @pytest.fixture
 def reset_mocked_mongo(request):
-    yield None  # Mocked fixture, used to run a finalizer after test exec
+    # Mocked fixture, used to run a finalizer after test exec
+    yield None
     mocked_mongo.reset()
 
 
@@ -76,9 +76,7 @@ app.blueprint(simplecrud)
 
 
 def test_get_all_docs():
-    request, response = sanic_endpoint_test(app,
-                                            uri='/crud/',
-                                            method='get')
+    request, response = app.test_client.get('/crud')
 
     assert response.status == 200
     assert loads(response.text) == mocked_mongo.docs
@@ -86,18 +84,14 @@ def test_get_all_docs():
 
 def test_get_doc():
     # Test a successful document fetch
-    request, response = sanic_endpoint_test(app,
-                                            uri='/crud/0',
-                                            method='get')
+    request, response = app.test_client.get('/crud/0')
 
     assert response.status == 200
     assert loads(response.text) == mocked_mongo.docs[0]
 
     # Test a failed document fetch expecting a 404
 
-    request, response = sanic_endpoint_test(app,
-                                            uri='/crud/10',
-                                            method='get')
+    request, response = app.test_client.get('/crud/10')
 
     assert response.status == 404
     assert response.text == 'Error: Cannot find document with id:10'
@@ -106,11 +100,7 @@ def test_get_doc():
 def test_insert(reset_mocked_mongo):
     doc_to_insert = {'hello': 'world'}
     pre_insert_doc_count = len(mocked_mongo.docs)
-    request, response = sanic_endpoint_test(app,
-                                            uri='/crud/',
-                                            method='post',
-                                            data=dumps(doc_to_insert)
-                                            )
+    request, response = app.test_client.post('/crud/', data=dumps(doc_to_insert))
 
     assert response.status == 200
     assert response.text == 'Successfully inserted document ' \
@@ -122,11 +112,7 @@ def test_insert(reset_mocked_mongo):
 def test_update(reset_mocked_mongo):
     doc_to_insert = {'hello': 'world'}
     pre_insert_doc_count = len(mocked_mongo.docs)
-    request, response = sanic_endpoint_test(app,
-                                            uri='/crud/0',
-                                            method='post',
-                                            data=dumps(doc_to_insert)
-                                            )
+    request, response = app.test_client.post('/crud/0', data=dumps(doc_to_insert))
 
     assert response.status == 200
     assert response.text == 'Successfully updated document with id:0'
@@ -135,14 +121,10 @@ def test_update(reset_mocked_mongo):
 
 
 def test_delete(reset_mocked_mongo):
-    request, response = sanic_endpoint_test(app,
-                                            uri='/crud/0',
-                                            method='delete')
+    request, response = app.test_client.delete('/crud/0')
     assert response.status == 200
     assert response.text == 'Successfully deleted document with id:0'
 
-    request, response = sanic_endpoint_test(app,
-                                            uri='/crud/99',
-                                            method='delete')
+    request, response = app.test_client.delete('/crud/99')
     assert response.status == 404
     assert response.text == 'Error: Cannot find document with id:99'
